@@ -52,10 +52,19 @@ public class MainController {
 
         // Find other rows
         cRowList.forEach(cRow -> {
+            List<String> whereClauseList = new ArrayList<>();
+            List<Object> columnList = new ArrayList<>();
+            colNameRowModel.getColumnList().forEach(colName -> {
+                String columnValue = cRow.getObject(colName.toString()).toString();
+                columnList.add(columnValue);
+                if(primaryKeyMap.containsKey(colName)) {
+                    whereClauseList.add(colName + "=" + columnValue);
+                }
+            });
+
             RowModel rowModel = new RowModel();
-            rowModel.setColumnList(colNameRowModel.getColumnList().stream()
-                    .map(colName -> cRow.getObject(colName.toString()).toString())
-                    .collect(Collectors.toList()));
+            rowModel.setColumnList(columnList);
+            rowModel.setWhereClause(String.join(" AND ", whereClauseList));
             rowModelList.add(rowModel);
         });
 
